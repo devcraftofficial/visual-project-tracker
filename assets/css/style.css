@@ -34,7 +34,7 @@ body {
   padding: 0;
 }
 
-/* center content to 1200px, not full-bleed */
+/* center content to 1200px */
 .app {
   max-width: 1200px;
   margin: 16px auto 24px;
@@ -44,7 +44,7 @@ body {
   padding: 16px 20px 20px;
 }
 
-/* ========= Top nav (full width bar) ========= */
+/* ========= Top nav ========= */
 .topnav {
   display: flex;
   justify-content: space-between;
@@ -224,7 +224,6 @@ body {
   transition: all 0.2s ease;
 }
 
-/* primary */
 .btn-add,
 .btn-primary,
 .btn-edit {
@@ -240,7 +239,6 @@ body {
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
 
-/* secondary */
 .btn-secondary {
   background: #ffffff;
   color: #111827;
@@ -269,7 +267,7 @@ body {
   width: 100%;
 }
 
-/* ========= Stats (smaller cards) ========= */
+/* ========= Stats ========= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -305,7 +303,7 @@ body {
   font-size: 0.86rem;
 }
 
-/* ========= Visual Analytics (compact) ========= */
+/* ========= Visual Analytics ========= */
 .analytics-dashboard {
   margin-bottom: 16px;
 }
@@ -375,7 +373,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* ========= Projects grid (smaller cards) ========= */
+/* ========= Projects ========= */
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -601,13 +599,21 @@ body {
 }
 
 /* ========= Responsive ========= */
-@media (max-width: 960px) {
+/* tablets */
+@media (max-width: 768px) {
+  .topnav {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+
+  .topnav-left {
+    gap: 10px;
+  }
+
   .topnav-menu {
     display: none;
   }
-}
 
-@media (max-width: 768px) {
   .app-main {
     padding: 0 10px 16px;
   }
@@ -621,7 +627,7 @@ body {
   .header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
   }
 
   .header-right {
@@ -648,9 +654,24 @@ body {
   }
 }
 
+/* phones */
 @media (max-width: 480px) {
+  .topnav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .filters {
+    gap: 6px;
+  }
+
+  .filter-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
   }
 
   .form-row {
@@ -663,5 +684,11 @@ body {
 
   .chart-card {
     height: 140px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
   }
 }
