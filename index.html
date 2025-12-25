@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visual Project Tracker – Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js (for all visual charts) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Top navigation -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <div class="brand-mark">
+          <span class="brand-logo">PT</span>
+          <div class="brand-text">
+            <span class="brand-name">ProjectTracker</span>
+            <span class="brand-sub">Overview</span>
+          </div>
+        </div>
+
+        <nav class="topnav-menu">
+          <span class="topnav-link topnav-link-active">Dashboard</span>
+          <a href="projects.html" class="topnav-link">Projects</a>
+        </nav>
+      </div>
+
+      <div class="topnav-right">
+        <div class="topnav-icon">🔔</div>
+        <div class="topnav-user">
+          <div class="user-info">
+            <span class="user-name">Rishvan</span>
+            <span class="user-role">Product Manager</span>
+          </div>
+          <div class="user-avatar">RV</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main dashboard -->
+    <main class="app-main">
+      <div class="app">
+
+        <!-- Dashboard header -->
+        <header class="header">
+          <div>
+            <div class="breadcrumb">
+              <span>Home</span> · <span>Dashboard</span>
+            </div>
+            <h1>📊 Project Tracker</h1>
+            <p class="header-subtitle">
+              Monitor all projects at a glance, add new work, and jump directly into tasks.
+            </p>
+          </div>
+          <div class="header-right">
+            <button class="btn-secondary" type="button" onclick="window.location.href='projects.html'">
+              View All Projects
+            </button>
+            <button class="btn-primary" type="button" onclick="openAddModal()">
+              + New Project
+            </button>
+          </div>
+        </header>
+
+        <!-- Stats -->
+        <section class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-number" id="ongoingCount">0</span>
+            <span class="stat-label">Ongoing</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-number" id="completedCount">0</span>
+            <span class="stat-label">Completed</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-number" id="upcomingCount">0</span>
+            <span class="stat-label">Upcoming</span>
+          </article>
+        </section>
+
+        <!-- Visual Analytics Dashboard -->
+        <section class="analytics-dashboard">
+          <h2 style="font-size:1.1rem;margin-bottom:12px;font-weight:600;color:#111827;">Visual Analytics</h2>
+          
+          <!-- Row 1: Pie Chart + Progress Doughnut -->
+          <div class="chart-row">
+            <!-- Status Distribution Pie -->
+            <div class="chart-card">
+              <h3 style="font-size:0.95rem;margin-bottom:8px;color:#374151;">Status Distribution</h3>
+              <canvas id="statusPieChart" height="120"></canvas>
+            </div>
+            
+            <!-- Average Progress Doughnut -->
+            <div class="chart-card">
+              <h3 style="font-size:0.95rem;margin-bottom:8px;color:#374151;">Avg Progress</h3>
+              <canvas id="progressDoughnut" height="120"></canvas>
+            </div>
+          </div>
+          
+          <!-- Row 2: Bar Chart + Timeline Line -->
+          <div class="chart-row">
+            <!-- Progress by Status Bar -->
+            <div class="chart-card">
+              <h3 style="font-size:0.95rem;margin-bottom:8px;color:#374151;">Progress by Status</h3>
+              <canvas id="progressBarChart" height="120"></canvas>
+            </div>
+            
+            <!-- Timeline Line (due dates) -->
+            <div class="chart-card">
+              <h3 style="font-size:0.95rem;margin-bottom:8px;color:#374151;">Timeline Overview</h3>
+              <canvas id="timelineLineChart" height="120"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters">
+          <button class="filter-btn active" data-status="all" onclick="filterProjects('all')">All</button>
+          <button class="filter-btn" data-status="ongoing" onclick="filterProjects('ongoing')">Ongoing</button>
+          <button class="filter-btn" data-status="completed" onclick="filterProjects('completed')">Completed</button>
+          <button class="filter-btn" data-status="upcoming" onclick="filterProjects('upcoming')">Upcoming</button>
+        </section>
+
+        <!-- Projects Grid -->
+        <section class="projects-grid" id="projectsGrid">
+          <!-- Projects will be rendered here by script.js -->
+        </section>
+
+        <!-- Add Project Modal -->
+        <div id="addModal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Add New Project</h2>
+              <span class="close" onclick="closeModal('addModal')">&times;</span>
+            </div>
+            <form id="projectForm">
+              <input type="text" id="projectName" placeholder="Project Name" required>
+              <textarea id="projectDesc" placeholder="Description"></textarea>
+              <div class="form-row">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+              </div>
+              <select id="projectStatus">
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+              <div class="form-row">
+                <label>Progress (%)</label>
+                <input type="range" id="projectProgress" min="0" max="100" value="0">
+                <span id="progressValue">0%</span>
+              </div>
+              <button type="submit" class="btn-primary btn-full">Create Project</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Details Modal -->
+        <div id="detailsModal" class="modal">
+          <div class="modal-content details-modal">
+            <div class="modal-header">
+              <h2 id="detailTitle"></h2>
+              <span class="close" onclick="closeModal('detailsModal')">&times;</span>
+            </div>
+            <div id="detailContent"></div>
+            <div class="modal-actions">
+              <button class="btn-secondary" type="button"
+                      onclick="window.location.href='tasks.html?projectId=' + getProjectIdFromTitle()">
+                View Tasks
+              </button>
+              <button class="btn-edit" onclick="editProject()">Edit</button>
+              <button class="btn-danger" onclick="deleteProject()">Delete</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="./assets/js/script.js"></script>
+  <script>
+    // Global chart instances
+    let charts = {};
+
+    // Helper to map detailTitle -> projectId for "View Tasks" from details modal
+    function getProjectIdFromTitle() {
+      const title = document.getElementById('detailTitle').textContent;
+      const projects = JSON.parse(localStorage.getItem('projects')) || [];
+      const proj = projects.find(p => p.name === title);
+      return proj ? proj.id : '';
+    }
+
+    // Enhanced update function - called from script.js
+    function updateAllCharts(ongoing, completed, upcoming, avgProgress, projectsData) {
+      const ctxPie = document.getElementById('statusPieChart')?.getContext('2d');
+      const ctxDoughnut = document.getElementById('progressDoughnut')?.getContext('2d');
+      const ctxBar = document.getElementById('progressBarChart')?.getContext('2d');
+      const ctxLine = document.getElementById('timelineLineChart')?.getContext('2d');
+
+      // 1. PIE CHART: Status Distribution [web:16]
+      if (ctxPie) {
+        const pieData = {
+          labels: ['Ongoing', 'Completed', 'Upcoming'],
+          datasets: [{
+            data: [ongoing, completed, upcoming],
+            backgroundColor: ['#22c55e', '#2563eb', '#9ca3af'],
+            borderWidth: 0,
+            borderRadius: 6
+          }]
+        };
+        charts.pie = createOrUpdateChart(ctxPie, {
+          type: 'pie',
+          data: pieData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+          }
+        }, 'pie');
+      }
+
+      // 2. DOUGHNUT: Average Progress [web:17]
+      if (ctxDoughnut) {
+        const doughnutData = {
+          labels: ['Completed', 'Remaining'],
+          datasets: [{
+            data: [avgProgress, 100 - avgProgress],
+            backgroundColor: ['#10b981', '#e5e7eb'],
+            borderWidth: 0,
+            cutout: '65%'
+          }]
+        };
+        charts.doughnut = createOrUpdateChart(ctxDoughnut, {
+          type: 'doughnut',
+          data: doughnutData,
+          options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } } 
+          }
+        }, 'doughnut');
+      }
+
+      // 3. BAR CHART: Progress by Status [web:33]
+      if (ctxBar) {
+        // Calculate average progress per status
+        const ongoingProjects = projectsData.filter(p => p.status === 'ongoing');
+        const completedProjects = projectsData.filter(p => p.status === 'completed');
+        const upcomingProjects = projectsData.filter(p => p.status === 'upcoming');
+        
+        const avgOngoing = ongoingProjects.length ? 
+          Math.round(ongoingProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / ongoingProjects.length) : 0;
+        const avgCompleted = completedProjects.length ? 
+          Math.round(completedProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / completedProjects.length) : 100;
+        const avgUpcoming = upcomingProjects.length ? 
+          Math.round(upcomingProjects.reduce((sum, p) => sum + (p.progress || 0), 0) / upcomingProjects.length) : 0;
+
+        const barData = {
+          labels: ['Ongoing', 'Completed', 'Upcoming'],
+          datasets: [{
+            label: 'Avg Progress %',
+            data: [avgOngoing, avgCompleted, avgUpcoming],
+            backgroundColor: ['#22c55e', '#2563eb', '#9ca3af'],
+            borderRadius: 6,
+            barThickness: 18
+          }]
+        };
+        charts.bar = createOrUpdateChart(ctxBar, {
+          type: 'bar',
+          data: barData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, max: 100, grid: { display: false }, ticks: { stepSize: 25 } },
+              x: { grid: { display: false } }
+            }
+          }
+        }, 'bar');
+      }
+
+      // 4. LINE CHART: Timeline (projects by due date weeks) [web:33]
+      if (ctxLine && projectsData?.length) {
+        const timelineData = getTimelineData(projectsData);
+        charts.line = createOrUpdateChart(ctxLine, {
+          type: 'line',
+          data: timelineData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { stepSize: 1 } },
+              x: { grid: { display: false } }
+            }
+          }
+        }, 'line');
+      }
+    }
+
+    // Helper: Create or update chart
+    function createOrUpdateChart(ctx, config, chartKey) {
+      if (charts[chartKey]) {
+        charts[chartKey].destroy();
+      }
+      return new Chart(ctx, config);
+    }
+
+    // Helper: Group projects by week for timeline
+    function getTimelineData(projects) {
+      const now = new Date();
+      const weeks = ['This Week', 'Next Week', 'Week 3', 'Week 4'];
+      const counts = [0, 0, 0, 0];
+      
+      projects.forEach(project => {
+        if (project.endDate) {
+          const endDate = new Date(project.endDate);
+          const diffTime = endDate - now;
+          const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+          
+          if (diffWeeks <= 0) counts[0]++;
+          else if (diffWeeks === 1) counts[1]++;
+          else if (diffWeeks === 2) counts[2]++;
+          else counts[3]++;
+        }
+      });
+      
+      return {
+        labels: weeks,
+        datasets: [{
+          data: counts,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      };
+    }
+
+    // Progress slider update
+    document.addEventListener('DOMContentLoaded', function() {
+      const progressSlider = document.getElementById('projectProgress');
+      const progressValue = document.getElementById('progressValue');
+      if (progressSlider && progressValue) {
+        progressSlider.oninput = function() {
+          progressValue.textContent = this.value + '%';
+        };
+      }
+
+      // Initial chart render with current data
+      setTimeout(() => {
+        const projects = JSON.parse(localStorage.getItem('projects')) || [];
+        const ongoing = projects.filter(p => p.status === 'ongoing').length;
+        const completed = projects.filter(p => p.status === 'completed').length;
+        const upcoming = projects.filter(p => p.status === 'upcoming').length;
+        const avgProgress = projects.length ? 
+          Math.round(projects.reduce((sum, p) => sum + (p.progress || 0), 0) / projects.length) : 0;
+        
+        updateAllCharts(ongoing, completed, upcoming, avgProgress, projects);
+      }, 100);
+    });
+  </script>
+</body>
+</html>

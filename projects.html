@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Projects – Tkar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Reuse dashboard theme so everything matches -->
+  <link rel="stylesheet" href="./assets/css/projects.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top navigation -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <div class="brand-mark">
+          <span class="brand-logo">PT</span>
+          <div class="brand-text">
+            <span class="brand-name">ProjectTracker</span>
+            <span class="brand-sub">Project overview</span>
+          </div>
+        </div>
+
+        <nav class="topnav-menu">
+          <a href="index.html" class="topnav-link">Dashboard</a>
+          <span class="topnav-link topnav-link-active">Projects</span>
+        </nav>
+      </div>
+
+      <div class="topnav-right">
+        <div class="topnav-icon">🔔</div>
+        <div class="topnav-user">
+          <div class="user-info">
+            <span class="user-name">John Doe</span>
+            <span class="user-role">Product Manager</span>
+          </div>
+          <div class="user-avatar">JD</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="app-main">
+      <div class="app">
+        <!-- Page header -->
+        <header class="header">
+          <div>
+            <div class="breadcrumb">
+              <span>Home</span> · <span>Projects</span>
+            </div>
+            <h1>Projects</h1>
+            <p class="header-subtitle">
+              View all ongoing and completed projects with progress, dates, and quick access to tasks.
+            </p>
+          </div>
+
+          <div class="header-right">
+            <!-- Small “Add Project” goes back to dashboard modal -->
+            <button class="btn-secondary" type="button" onclick="window.location.href='index.html'">
+              + New Project
+            </button>
+          </div>
+        </header>
+
+        <!-- Filter + search -->
+        <section class="top-row">
+          <div class="control-bar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input id="projectSearch" type="text" placeholder="Search projects…" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Overall stats -->
+        <section class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-number" id="countOngoing">0</span>
+            <span class="stat-label">Ongoing Projects</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-number" id="countCompleted">0</span>
+            <span class="stat-label">Completed Projects</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label stat-label-strong">Average Progress</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="projectsProgressFill" style="width:0%"></div>
+            </div>
+            <div class="progress-text" id="projectsProgressText">0% Complete</div>
+          </article>
+        </section>
+
+        <!-- Ongoing projects -->
+        <section style="margin-top: 8px; margin-bottom: 16px;">
+          <h2 style="font-size: 1rem; margin: 0 0 6px;">Ongoing Projects</h2>
+          <p style="margin: 0 0 8px; font-size: 0.84rem; color: var(--text-soft);">
+            Active work in progress.
+          </p>
+          <div id="ongoingList" class="projects-grid">
+            <!-- ongoing cards inserted by JS:
+              <article class="project-card">
+                <div class="project-card-header">
+                  <h3 class="project-title">Project name</h3>
+                  <button class="icon-btn icon-delete" onclick="deleteProjectFromProjectsPage('ID'); event.stopPropagation();">
+                    ✕
+                  </button>
+                </div>
+                ...
+                <div class="project-footer">
+                  <button class="btn-pill" onclick="goToTasksFromProjects('ID')">View Tasks</button>
+                </div>
+              </article>
+            -->
+          </div>
+        </section>
+
+        <!-- Completed projects -->
+        <section style="margin-top: 4px;">
+          <h2 style="font-size: 1rem; margin: 0 0 6px;">Completed Projects</h2>
+          <p style="margin: 0 0 8px; font-size: 0.84rem; color: var(--text-soft);">
+            Finished projects and their final stats.
+          </p>
+          <div id="completedList" class="projects-grid">
+            <!-- completed cards inserted by JS, same structure as ongoingList -->
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="./assets/js/projects.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Tasks – Tkar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Light theme stylesheet -->
+  <link rel="stylesheet" href="./assets/css/tasks.css">
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Top navigation bar -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <div class="brand-mark">
+          <span class="brand-logo">PT</span>
+          <div class="brand-text">
+            <span class="brand-name">ProjectTracker</span>
+            <span class="brand-sub">Task workspace</span>
+          </div>
+        </div>
+
+        <nav class="topnav-menu">
+          <a href="index.html" class="topnav-link">Dashboard</a>
+          <a href="projects.html" class="topnav-link">Projects</a>
+          <span class="topnav-link topnav-link-active">Tasks</span>
+        
+        </nav>
+      </div>
+
+      <div class="topnav-right">
+        <div class="topnav-icon">🔔</div>
+        <div class="topnav-icon">💬</div>
+        <div class="topnav-user">
+          <div class="user-info">
+            <span class="user-name">John Doe</span>
+            <span class="user-role">Product Manager</span>
+          </div>
+          <div class="user-avatar">JD</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main class="app-main">
+      <div class="app">
+
+        <!-- Page header -->
+        <header class="header">
+          <div>
+            <div class="breadcrumb">
+              <span>Projects</span> · <span id="projectBreadcrumb">Details</span>
+            </div>
+            <h1 id="projectTitle">Project Tasks</h1>
+            <p class="header-subtitle">
+              Manage individual tasks for this project, track progress, and keep work on schedule.
+            </p>
+          </div>
+
+          <div class="header-right">
+            <button class="btn-secondary" type="button" onclick="window.location.href='index.html'">
+              ⬅ Back to Dashboard
+            </button>
+            <button class="btn-primary" type="button" onclick="openTaskModal()">+ New Task</button>
+          </div>
+        </header>
+
+        <!-- Filters row -->
+        <section class="top-row">
+          <div class="control-bar">
+            <div class="search-input">
+              <span class="search-icon">🔍</span>
+              <input id="taskSearch" type="text" placeholder="Search tasks…">
+            </div>
+
+            <!-- status toggle -->
+            <div class="view-toggle" id="statusToggle">
+              <button type="button" data-status="all" class="active">All</button>
+              <button type="button" data-status="open">Open</button>
+              <button type="button" data-status="done">Done</button>
+            </div>
+
+            <!-- assignee filter: Mine / All -->
+            <div class="view-toggle" id="assigneeToggle" style="margin-left:8px;">
+              <button type="button" data-assignee="all" class="active">All assignees</button>
+              <button type="button" data-assignee="me">Assigned to me</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stats summary -->
+        <section class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-number" id="taskCompleted">0</span>
+            <span class="stat-label">Tasks Done</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-number" id="taskTotal">0</span>
+            <span class="stat-label">Total Tasks</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-label stat-label-strong">Overall Progress</span>
+            <div class="progress-bar">
+              <div class="progress-fill" id="tasksProgressFill" style="width:0%"></div>
+            </div>
+            <div class="progress-text" id="tasksProgressText">0% Complete</div>
+          </article>
+        </section>
+
+        <!-- Task cards -->
+        <section id="tasksList" class="projects-grid">
+          <!-- cards injected by tasks.js -->
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Add / Edit Task Modal -->
+    <div id="taskModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Add Task</h2>
+          <span class="close" onclick="closeModal('taskModal')">&times;</span>
+        </div>
+
+        <form id="taskForm">
+          <!-- Task basics -->
+          <input type="text" id="taskTitle" placeholder="Task title" required>
+          <textarea id="taskNotes" placeholder="Notes (optional)"></textarea>
+
+          <!-- Assignee info -->
+          <div class="form-row">
+            <input type="text" id="taskAssignee" placeholder="Assignee name (e.g. John Doe)">
+            <input type="email" id="taskAssigneeEmail" placeholder="Assignee email">
+          </div>
+
+          <!-- Priority + due date -->
+          <div class="form-row">
+            <select id="taskPriority">
+              <option value="medium">Medium priority</option>
+              <option value="high">High priority</option>
+              <option value="low">Low priority</option>
+            </select>
+            <input type="date" id="taskDue">
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="taskDone"> Mark as completed
+          </label>
+
+          <button type="submit" class="btn-primary btn-full">Save Task</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./assets/js/tasks.js"></script>
+  <script>
+    // Small helper so "Assigned to me" filter knows current user's email.
+    // Change this value or read from auth in the future.
+    const CURRENT_USER_EMAIL = "john.doe@example.com";
+
+    // Wire up local UI filters (status + assignee + search) once tasks.js exposes a render hook.
+    document.addEventListener("DOMContentLoaded", () => {
+      const statusToggle = document.getElementById("statusToggle");
+      const assigneeToggle = document.getElementById("assigneeToggle");
+      const searchInput = document.getElementById("taskSearch");
+
+      if (!statusToggle || !assigneeToggle || !searchInput) return;
+
+      statusToggle.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
+        statusToggle.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+        e.target.classList.add("active");
+        window.applyTaskFilters && window.applyTaskFilters();
+      });
+
+      assigneeToggle.addEventListener("click", (e) => {
+        if (e.target.tagName !== "BUTTON") return;
+        assigneeToggle.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+        e.target.classList.add("active");
+        window.applyTaskFilters && window.applyTaskFilters();
+      });
+
+      searchInput.addEventListener("input", () => {
+        window.applyTaskFilters && window.applyTaskFilters();
+      });
+
+      // Expose helpers for tasks.js
+      window.getTaskFilterState = function () {
+        const status = statusToggle.querySelector("button.active")?.dataset.status || "all";
+        const assignee = assigneeToggle.querySelector("button.active")?.dataset.assignee || "all";
+        const search = searchInput.value.trim().toLowerCase();
+        return { status, assignee, search, currentUserEmail: CURRENT_USER_EMAIL };
+      };
+    });
+  </script>
+</body>
+</html>
